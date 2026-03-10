@@ -1,0 +1,62 @@
+function var_dot = QuadrotorEOM(t, var, g, m, I, d, km, nu, mu, motor_forces)
+    % var: [x; y; z; phi; theta; psi; u; v; w; p; q; r]
+    
+    % states
+    phi = var(4);
+    theta = var(5);
+    psi = var(6);
+    u = var(7);
+    v = var(8);
+    w = var(9);
+    p = var(10);
+    q = var(11);
+    r = var(12);
+    
+    % Inertia
+    Ix = I(1,1);
+    Iy = I(2,2);
+    Iz = I(3,3);
+
+    % Control Forces and Moments from Motor Thrusts
+    f1 = motor_forces(1);
+    f2 = motor_forces(2); 
+    f3 = motor_forces(3);
+    f4 = motor_forces(4);
+    
+    Zc = -f1 - f2 - f3 - f4;
+    Lc = (d/sqrt(2)) * (-f1 - f2 + f3 + f4);
+    Mc = (d/sqrt(2)) * (f1 - f2 - f3 + f4);
+    Nc = km * (f1 - f2 + f3 - f4);
+
+    % Inertial Position Rates
+   
+    cos_p = cos(phi);
+    sin_p = sin(phi);
+    cos_t = cos(theta);
+    sin_t = sin(theta);
+    cos_s = cos(psi);
+    sin_s = sin(psi); 
+
+    % Rotation matrix from Body to Inerial (Standard 3-2-1)
+    x_dot = u*(cos_t*cos_s) + v*(sin_p*sin_t*cos_s - cos_p*sin_s) + w*(cos_p*sin_t*cos_s + sin_p*sin_s);
+    y_dot = u*(cos_t*sin_s) + v*(sin_p*sin_t*sin_s + cos_p*cos_s) + w*(cos_p*sin_t*sin_s - sin_p*cos_s);
+    z_dot = -u*sin_t + v*sin_p*cos_t + w*cos_p*cos_t;
+
+    % Euler Angle Rates
+    phi_dot = p + q*sin_p*tan(theta) + r*cos_p*tan(theta);
+    theta_dot = q*cos_p - r*sin_p;
+    psi_dot = q*sin_p/cos(theta) + r*cos_p/cos(theta);
+
+    % Body Frame Accelerations
+    u_dot = r*v - q*w + g*sin(theta);
+    v_dot = p*w - r*u - g*cos(theta)*sin(phi);
+    w_dot = q*u - p*v - g*cos(theta)*cos(phi) - (Zc/m);
+
+    % Angular Body Frame
+    
+    p_dot = (Lc + (Iy - Iz)*q*r) / Ix;
+    q_dot = (Mc + (Iz - Ix)*p*r) / Iy;
+    r_dot = (Nc + (Ix - Iy)*p*q) / Iz;
+
+    var_dot = [x_dot; y_dot; z_dot; phi_dot; theta_dot; psi_dot; u_dot; v_dot; w_dot; p_dot; q_dot; r_dot];
+end
