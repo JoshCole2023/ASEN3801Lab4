@@ -1,0 +1,25 @@
+clc
+clear
+close all
+
+% Initial conditions
+m = 0.068;
+g = 9.8;
+d = 0.060;
+km = 0.0024;
+Ixx = 5.8E-5;
+Iyy = 7.2E-5;
+Izz = 1.0E-4;
+nu = 1E-3;
+mu = 2E-6;
+I = [Ixx, 0, 0; 0, Iyy, 0; 0, 0, Izz];
+motor_forces = 
+
+% Load data
+load("RSdata_nocontrol.mat")
+tspan = [0, rt_tout(end)];
+t = rt_tout;
+var = rt_estim.signals.values;
+
+% Integration
+[t, state] = ode45(QuadrotorEOM(t, var, g, m, I, d, km, nu, mu, motor_forces), tspan, rt_estim.signals.values(1,:));
