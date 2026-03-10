@@ -1,17 +1,17 @@
 function var_dot = QuadrotorEOM(~, var, g, m, I, d, km, nu, mu, motor_forces)
 
-    x = var(1,:);
-    y = var(2,:);
-    z = var(3,:);
-    u = var(4,:);
-    v = var(5,:);
-    w = var(6,:);
-    phi = var(7,:);
-    theta = var(8,:);
-    psi = var(9,:);
-    p = var(10,:);
-    q = var(11,:);
-    r = var(12,:);
+    x = var(1);
+    y = var(2);
+    z = var(3);
+    u = var(4);
+    v = var(5);
+    w = var(6);
+    phi = var(7);
+    theta = var(8);
+    psi = var(9);
+    p = var(10);
+    q = var(11);
+    r = var(12);
 
     Ix = I(1, 1);
     Iy = I(2, 2);
@@ -28,13 +28,13 @@ function var_dot = QuadrotorEOM(~, var, g, m, I, d, km, nu, mu, motor_forces)
     Mc = motorinputs(3);
     Nc = motorinputs(4);
 
-    L = -mu*p*sqrt(p^2 + q^2 + r^2);
-    M = -mu*q*sqrt(p^2 + q^2 + r^2);
-    N = -mu*r*sqrt(p^2 + q^2 + r^2);
+    L = -mu.*p*sqrt(p.^2 + q.^2 + r.^2);
+    M = -mu.*q*sqrt(p.^2 + q.^2 + r.^2);
+    N = -mu.*r*sqrt(p.^2 + q.^2 + r.^2);
 
-    X = -nu*u*sqrt(u^2 + v^2 + w^2);
-    Y = -nu*v*sqrt(u^2 + v^2 + w^2);
-    Z = -nu*w*sqrt(u^2 + v^2 + w^2);
+    X = -nu.*u*sqrt(u.^2 + v.^2 + w.^2);
+    Y = -nu.*v*sqrt(u.^2 + v.^2 + w.^2);
+    Z = -nu.*w*sqrt(u.^2 + v.^2 + w.^2);
 
     pos_dot = [cos(theta)*cos(psi), sin(phi)*sin(theta)*cos(psi)-cos(phi)*cos(psi), cos(phi)*sin(theta)*cos(psi)+sin(phi)*sin(psi);
            cos(theta)*sin(psi), sin(phi)*sin(theta)*cos(psi)+cos(phi)*cos(psi), cos(phi)*sin(theta)*cos(psi)-sin(phi)*sin(psi);
@@ -47,6 +47,9 @@ function var_dot = QuadrotorEOM(~, var, g, m, I, d, km, nu, mu, motor_forces)
     vel_dot = [r*v - q*w; p*w - r*u; q*u - p*v] + g .* [-sin(theta); cos(theta)*sin(phi); cos(theta)*cos(phi)] + (1/m) .* [X; Y; Z] + (1/m) .* [0; 0; Zc];
     rot_dot = [((Iy-Iz)/Ix) * q * r; ((Iz-Ix)/Iy) * p * r; ((Ix-Iy)/Iz) * p * q] + [(1/Ix)*L; (1/Iy)*M; (1/Iz)*N] + [(1/Ix) * Lc; (1/Iy) * Mc; (1/Iz) * Nc];
 
+    var_dot = [pos_dot; vel_dot; Eul_dot; rot_dot];
+
+end
     var_dot = [pos_dot; vel_dot; Eul_dot; rot_dot];
 
 end
