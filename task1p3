@@ -1,0 +1,34 @@
+clc
+clear
+close all
+
+m = 0.068;
+g = 9.8;
+d = 0.060;
+km = 0.0024;
+Ixx = 5.8E-5;
+Iyy = 7.2E-5;
+Izz = 1.0E-4;
+nu = 1e-3;
+mu = 2e-6;
+I = [Ixx, 0, 0; 0, Iyy, 0; 0, 0, Izz];
+statevec_init = zeros(12,1);
+
+tspan = [0, 10];
+
+motor_forces = [(m*g)/4, (m*g)/4, (m*g)/4, (m*g)/4]';
+var = statevec_init;
+[t, state] = ode45(@(t, var) QuadrotorEOM(t, var, g, m, I, d, km, nu, mu, motor_forces), tspan, statevec_init);
+
+fig = 1:1:4;
+col = 'b-';
+control_input_array = [-1, -1, -1, -1; -d/sqrt(2), -d/sqrt(2), d/sqrt(2), d/sqrt(2); 
+    d/sqrt(2), -d/sqrt(2), -d/sqrt(2), d/sqrt(2); km, -km, km, -km] * motor_forces;
+
+for i = 1:length(t)
+    control_input_full = zeros(4, length(t));
+    control_input_full(:, i) = control_input_array;
+end
+
+plot(t, state(:,3))
+PlotAircraftSim(t, state, control_input_array', fig, col)
