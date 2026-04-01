@@ -9,7 +9,7 @@ function PlotAircraftSim(time, aircraft_state_array, control_input_array, fig, c
             sgtitles = ["Position vs. Time", "Angular Position vs. Time", "Velocity vs. Time", "Angular Velocity vs. Time"];
             titles = ["Inertial x Position x_E", "Inertial y Position y_E", "Inertial z Position z_E"
                 "Roll Angle \phi", "Pitch Angle \theta", "Yaw Angle \psi"
-                "Body x Velocity u_E", "Body y Velocity u_E", "Body z Velocity u_E"
+                "Body x Velocity u_E", "Body y Velocity v_E", "Body z Velocity w_E"
                 "Roll Rate p", "Pitch Rate q", "Yaw Rate r"]';
             subplot(3,1,sp(i))
             plot(time,aircraft_state_array(:,i),col)
