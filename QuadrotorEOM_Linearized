@@ -1,0 +1,28 @@
+function var_dot = QuadrotorEOM_Linearized(~, var, g, m, I, deltaFc, deltaGc)
+
+    dphi = var(4);
+    dtheta = var(5);
+    du = var(7);
+    dv = var(8);
+    dw = var(9);
+    dp = var(10);
+    dq = var(11);
+    dr = var(12);
+
+    Ix = I(1, 1); 
+    Iy = I(2, 2); 
+    Iz = I(3, 3);
+
+    dZc = deltaFc(3);
+    dLc = deltaGc(1);
+    dMc = deltaGc(2);
+    dNc = deltaGc(3);
+
+    pos_dot = [du; dv; dw];
+    Eul_dot = [dp; dq; dr];
+    vel_dot = [-g*dtheta; g*dphi; (1/m)*dZc];
+    rot_dot = [(1/Ix)*dLc; (1/Iy)*dMc; (1/Iz)*dNc];
+
+    var_dot = [pos_dot; Eul_dot; vel_dot; rot_dot];
+
+end
