@@ -1,0 +1,88 @@
+%% Task 2 Main Script - Linear Equations and Simple Control
+clear; 
+clc; 
+close all;
+
+%% parameters
+m = 0.068;
+g = 9.81;
+
+Ixx = 5.8e-5;
+Iyy = 7.2e-5;
+Izz = 1.0e-4;
+I = diag([Ixx Iyy Izz]);
+
+d = 0.060;
+km = 0.0024;
+
+nu = 1e-3;
+mu = 2e-6;
+
+tspan = [0 10];
+deg = pi/180;
+
+% hover thrust
+f_trim = m*g/4;
+motor_trim = [f_trim; f_trim; f_trim; f_trim];
+
+% disturbance cases
+cases = {
+    [0 0 0 deg2rad(5) 0 0 0 0 0 0 0 0]' , 'roll angle'
+    [0 0 0 0 deg2rad(5) 0 0 0 0 0 0 0]' , 'pitch angle'
+    [0 0 0 0 0 deg2rad(5) 0 0 0 0 0 0]' , 'yaw angle'
+    [0 0 0 0 0 0 0 0 0 0.1 0 0]' , 'roll rate (p)'
+    [0 0 0 0 0 0 0 0 0 0 0.1 0]' , 'pitch rate (q)'
+    [0 0 0 0 0 0 0 0 0 0 0 0.1]' , 'yaw rate (r)'
+};
+
+%% Task 2.1 — Nonlinear Model
+
+deltaFc = [0; 0; 0];
+deltaGc = [0; 0; 0];
+
+for i = 1:length(cases)
+
+    % Update initial statevector
+    statevec_init = cases{i};
+    motor_forces = motor_trim;
+    var = statevec_init;
+
+    % Simulate for current disturbance case
+    [t, state] = ode45(@(t, var) QuadrotorEOM(t, var, g, m, I, d, km, nu, mu, motor_forces), tspan, statevec_init);
+    [t_lin, state_lin] = ode45(@(t, var) QuadrotorEOM_Linearized(t, var, g, m, I, deltaFc, deltaGc), tspan, statevec_init);
+
+    % Outline plot parameters
+    fig = 1:1:4;
+    col = 'b-';
+    control_input_array = [-1, -1, -1, -1; -d/sqrt(2), -d/sqrt(2), d/sqrt(2), d/sqrt(2); 
+        d/sqrt(2), -d/sqrt(2), -d/sqrt(2), d/sqrt(2); km, -km, km, -km] * motor_forces;
+    
+    control_input_full = zeros(4, length(t));
+
+    for j = 1:length(t)
+
+        control_input_full(:, j) = control_input_array;
+
+    end
+
+    control_input_full = control_input_full';
+
+
+    control_input_array_lin = [-1, -1, -1, -1; -d/sqrt(2), -d/sqrt(2), d/sqrt(2), d/sqrt(2); 
+        d/sqrt(2), -d/sqrt(2), -d/sqrt(2), d/sqrt(2); km, -km, km, -km] * motor_forces;
+    
+    control_input_full_lin = zeros(4, length(t_lin));
+
+    for j = 1:length(t_lin)
+
+        control_input_full_lin(:, j) = control_input_array_lin;
+
+    end
+
+    control_input_full_lin = control_input_full_lin';
+    % Plot results for disturbance case
+    PlotAircraftSimComparison(t, t_lin, state, state_lin, control_input_full, control_input_full_lin, fig, col);    
+
+end
+
+
