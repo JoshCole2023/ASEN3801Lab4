@@ -3,7 +3,7 @@ function PlotAircraftSim(time, aircraft_state_array, control_input_array, fig, c
     e=3;
     y_label = ["x_E (m)", "y_E (m)", "z_E (m)", "\phi (rad)", "\theta (rad)", "\psi (rad)", "u_E (m/s)", "v_E (m/s)", "w_E (m/s)", "p (rad/s)", "q (rad/s)", "r (rad/s)"];
     for j = 1:length(fig)
-        figure(fig(j))
+        figure()
         for i = s:e
             sp = [1,2,3,1,2,3,1,2,3,1,2,3];
             sgtitles = ["Position vs. Time", "Angular Position vs. Time", "Velocity vs. Time", "Angular Velocity vs. Time"];
